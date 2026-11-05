@@ -36,6 +36,99 @@ enum G6 {
         }
     }
 
+    // MARK: Zaokrouhlování
+    static let roundPlaces: [(Int, String)] = [
+        (10, "desítky"), (100, "stovky"), (1000, "tisíce"), (10_000, "desetitisíce"), (100_000, "statisíce"),
+    ]
+
+    /// Zaokrouhlení nezáporného celého čísla na násobek `p` (5 a víc nahoru).
+    static func roundInt(_ n: Int, _ p: Int) -> Int { (n + p / 2) / p * p }
+
+    /// Celé číslo `m` chápané jako desetinné s `k` místy, vypsané s pevným počtem míst (např. 3,0).
+    static func fixedStr(_ m: Int, _ k: Int) -> String {
+        let f = ipow(10, k)
+        guard k > 0 else { return "\(m)" }
+        let frac = String(m % f)
+        return "\(m / f)," + String(repeating: "0", count: k - frac.count) + frac
+    }
+
+    static func zaokrouhlovani(_ d: Int) -> Question {
+        let places = Array(roundPlaces.prefix(d == 1 ? 2 : d == 2 ? 3 : 5))
+        switch rnd(0...4) {
+        case 0:
+            // Celé číslo na řád
+            let (p, name) = pick(places)
+            let n = rnd((p * 2)...max(p * 20, d == 1 ? 9_999 : 999_999))
+            let r = roundInt(n, p)
+            let digit = n / (p / 10) % 10
+            return .integer("Zaokrouhli číslo \(n) na \(name).", r,
+                            hint: "Rozhoduje číslice hned za místem, na které zaokrouhluješ: 0–4 dolů, 5–9 nahoru.",
+                            explanation: "Rozhoduje číslice \(digit) → zaokrouhlujeme \(digit >= 5 ? "nahoru" : "dolů"). \(n) ≐ \(r)")
+        case 1:
+            // Desetinné číslo na jednotky / desetiny / setiny
+            let k = d == 1 ? 2 : 3
+            let q = rnd(0...(k - 1))
+            let factor = ipow(10, k - q)
+            var m: Int
+            if d >= 2 && q >= 1 && chance(0.35) {
+                // přechod přes devítky, např. 4,96 → 5,0
+                let a = rnd(1...99), nines = ipow(10, q) - 1
+                m = (a * ipow(10, q) + nines) * factor + rnd((factor / 2)...(factor - 1))
+            } else {
+                repeat { m = rnd((ipow(10, k) + 1)...(99 * ipow(10, k))) } while m % 10 == 0
+            }
+            let r = roundInt(m, factor)
+            let digit = m / (factor / 10) % 10
+            let name = ["na celá čísla (jednotky)", "na desetiny", "na setiny"][q]
+            let rStr = fixedStr(r / factor, q)
+            return .number("Zaokrouhli číslo \(fixedStr(m, k)) \(name).", Double(r) / Double(ipow(10, k)),
+                           hint: "Podívej se na číslici hned za místem, na které zaokrouhluješ. Zbytek za ní škrtni.",
+                           explanation: "Rozhoduje číslice \(digit) → \(digit >= 5 ? "nahoru" : "dolů"). \(fixedStr(m, k)) ≐ \(rStr)")
+        case 2:
+            // Nejmenší / největší číslo, které se zaokrouhlí na dané
+            let (p, name) = pick(places)
+            let r = rnd(2...(d == 1 ? 50 : 99)) * p
+            let smallest = chance(0.5)
+            let ans = smallest ? r - p / 2 : r + p / 2 - 1
+            return .integer("Jaké \(smallest ? "nejmenší" : "největší") přirozené číslo dá po zaokrouhlení na \(name) číslo \(r)?", ans,
+                            hint: "Na \(r) se zaokrouhlují čísla od \(r) − \(p / 2) do \(r) + \(p / 2 - 1).",
+                            explanation: "Na \(name) se na \(r) zaokrouhlí čísla \(r - p / 2) až \(r + p / 2 - 1). \(smallest ? "Nejmenší" : "Největší") je \(ans).")
+        case 3:
+            // Odhad výsledku
+            let p = d == 1 ? 10 : (d == 2 ? pick([10, 100]) : 100)
+            let name = p == 10 ? "desítky" : "stovky"
+            let a = rnd((p + 1)...(p * 99)), b = rnd((p + 1)...(p * 99))
+            let ra = roundInt(a, p), rb = roundInt(b, p)
+            if d == 3 && chance(0.5) {
+                let x = rnd(11...99), y = rnd(11...99)
+                let rx = roundInt(x, 10), ry = roundInt(y, 10)
+                return .integer("Odhadni součin \(x) · \(y): obě čísla zaokrouhli na desítky a vynásob.", rx * ry,
+                                hint: "Nejdřív zaokrouhli každé číslo zvlášť, pak počítej.",
+                                explanation: "\(x) ≐ \(rx), \(y) ≐ \(ry); \(rx) · \(ry) = \(rx * ry) (přesně \(x * y)).")
+            }
+            if chance(0.5) || ra == rb {
+                return .integer("Odhadni součet \(a) + \(b): obě čísla zaokrouhli na \(name) a sečti.", ra + rb,
+                                hint: "Nejdřív zaokrouhli každé číslo zvlášť, pak počítej.",
+                                explanation: "\(a) ≐ \(ra), \(b) ≐ \(rb); \(ra) + \(rb) = \(ra + rb) (přesně \(a + b)).")
+            }
+            let (big, small) = a > b ? (a, b) : (b, a)
+            let (rBig, rSmall) = (roundInt(big, p), roundInt(small, p))
+            return .integer("Odhadni rozdíl \(big) − \(small): obě čísla zaokrouhli na \(name) a odečti.", rBig - rSmall,
+                            hint: "Nejdřív zaokrouhli každé číslo zvlášť, pak počítej.",
+                            explanation: "\(big) ≐ \(rBig), \(small) ≐ \(rSmall); \(rBig) − \(rSmall) = \(fmt(rBig - rSmall)) (přesně \(big - small)).")
+        default:
+            // Které číslo se zaokrouhlí na dané?
+            let (p, name) = pick(places)
+            let r = rnd(2...(d == 1 ? 50 : 99)) * p
+            let correct = rnd((r - p / 2)...(r + p / 2 - 1))
+            let wrong = [r - p / 2 - 1, r + p / 2, r - p / 2 - rnd(1...max(1, p / 5)), r + p / 2 + rnd(0...max(0, p / 5))]
+            return .choice("Které číslo dá po zaokrouhlení na \(name) číslo \(r)?", correct: "\(correct)",
+                           wrong: wrong.shuffled().map { "\($0)" },
+                           hint: "Na \(r) se zaokrouhlují čísla od \(r - p / 2) do \(r + p / 2 - 1).",
+                           explanation: "\(correct) ≐ \(r). Ostatní čísla leží mimo rozmezí \(r - p / 2) až \(r + p / 2 - 1).")
+        }
+    }
+
     // MARK: Zlomky
     static func zlomky(_ d: Int) -> Question {
         switch rnd(0...3) {

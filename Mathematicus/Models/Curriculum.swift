@@ -114,6 +114,7 @@ enum Curriculum {
                   ("Úhly", "Doplňkové, vedlejší, trojúhelník", "angle", G6.uhly),
                   ("Obvod a obsah", "Obdélník a čtverec", "square.dashed", G6.obvodObsah),
                   ("Krychle a kvádr", "Objem a povrch", "cube.fill", G6.krychleKvadr),
+                  ("Zaokrouhlování", "Celá a desetinná čísla, odhad výsledku", "arrow.up.and.down.circle.fill", G6.zaokrouhlovani),
               ])),
         Grade(number: 7, title: "7. třída", motto: "Zlomky, celá čísla, procenta, hranoly",
               colors: [Color(red: 0.15, green: 0.75, blue: 0.55), Color(red: 0.1, green: 0.55, blue: 0.75)],

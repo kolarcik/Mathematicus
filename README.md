@@ -5,7 +5,7 @@ Bundle ID: `cz.mathematicus.app`
 
 ## Jak to funguje
 - **Profily** – každé dítě má svého hráče (avatar, XP, úroveň, denní série 🔥).
-- **Rozcestník tříd** 6.–9. → v každé třídě 9 okruhů.
+- **Rozcestník tříd** 6.–9. → v každé třídě 9–10 okruhů.
 - **Trénink** – 10 náhodně generovaných příkladů (lehká/střední/těžká) s nápovědou a vysvětlením řešení.
   Výsledek alespoň 6/10 odemkne challenge okruhu.
 - **Challenge** na konci okruhu (střídají se):
@@ -18,7 +18,7 @@ Bundle ID: `cz.mathematicus.app`
 ## Okruhy
 | Třída | Okruhy |
 |---|---|
-| 6. | Přirozená čísla, Desetinná čísla, Dělitelnost, Zlomky, Rovnice a nerovnice, Převody jednotek, Úhly, Obvod a obsah, Krychle a kvádr |
+| 6. | Přirozená čísla, Desetinná čísla, Dělitelnost, Zlomky, Rovnice a nerovnice, Převody jednotek, Úhly, Obvod a obsah, Krychle a kvádr, Zaokrouhlování |
 | 7. | Zlomky, Celá čísla, Racionální čísla, Poměr, Úměrnost, Procenta, Promile, Obsahy útvarů, Hranoly |
 | 8. | Druhá mocnina a odmocnina, Pythagorova věta, Mocniny, Výrazy, Mnohočleny, Lineární rovnice, Kruh a kružnice, Válec, Statistika |
 | 9. | Vzorce, Lomené výrazy, Soustavy rovnic, Lineární funkce, Podobnost, Jehlan a kužel, Koule, Goniometrie, Finanční matematika |

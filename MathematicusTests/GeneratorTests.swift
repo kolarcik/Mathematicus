@@ -36,6 +36,22 @@ final class GeneratorTests: XCTestCase {
         }
     }
 
+    func testRoundingHelpers() {
+        XCTAssertEqual(G6.roundInt(344, 10), 340)
+        XCTAssertEqual(G6.roundInt(345, 10), 350)
+        XCTAssertEqual(G6.roundInt(2_449, 100), 2_400)
+        XCTAssertEqual(G6.roundInt(4_960, 100), 5_000)
+        XCTAssertEqual(G6.fixedStr(50, 1), "5,0")
+        XCTAssertEqual(G6.fixedStr(1_205, 3), "1,205")
+        XCTAssertEqual(G6.fixedStr(7, 0), "7")
+        for _ in 0..<300 {
+            for d in 1...3 {
+                let q = G6.zaokrouhlovani(d)
+                if case .number(let v, _) = q.answer { XCTAssertGreaterThanOrEqual(v, 0, q.prompt) }
+            }
+        }
+    }
+
     func testInputParsing() {
         let q = Question.number("", 2.5, explanation: "")
         XCTAssertTrue(q.isCorrect("2,5"))
